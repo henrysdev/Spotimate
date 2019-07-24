@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Spotimate - TEST PLAYBACK</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
+        integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
+        crossorigin="anonymous">
+    <script>
+      function browser_device(device_id) {
+        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
+        const Http = new XMLHttpRequest();
+        const url='http://localhost:4000/api/player/browser_device';
+        const params=`device_id=${device_id}`
+        Http.open("POST", url, true);
+        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
+        Http.send(params);
+        console.log('device_id: ', device_id)
+        Http.onreadystatechange = (e) => {
+          console.log(Http.responseText)
+        }
+      }
+      function play() {
+        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
+        const Http = new XMLHttpRequest();
+        const url='http://localhost:4000/api/player/play';
+        Http.open("POST", url, true);
+        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
+        Http.send();
+        Http.onreadystatechange = (e) => {
+          console.log(Http.responseText)
+        }
+      }
+      function pause() {
+        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
+        const Http = new XMLHttpRequest();
+        const url='http://localhost:4000/api/player/pause';
+        Http.open("POST", url, true);
+        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
+        Http.send();
+        Http.onreadystatechange = (e) => {
+          console.log(Http.responseText)
+        }
+      }
+    </script>
+  </head>
+  <body>
+
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+
+    <script>
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        const token = 'BQChV-7oruE6ErOAzYVWTbDEHyKxeS1dUnhWVtQHS0J-pugzVl3KrOVwabqfIBHxZBGxqIs8OwTHFH6L3xUZWJLN8mA3pI0FPdgf-5hmtNWwKZyqDcwV0WHdERaMhK7CP5U9hq-jD8fJp2FIYUqtz26NOCLx2slE-JekwQTAC8RQ';
+        const player = new Spotify.Player({
+          name: 'Web Playback SDK Quick Start Player',
+          getOAuthToken: cb => { cb(token); }
+        });
+
+        // Error handling
+        player.addListener('initialization_error', ({ message }) => { console.error(message); });
+        player.addListener('authentication_error', ({ message }) => { console.error(message); });
+        player.addListener('account_error', ({ message }) => { console.error(message); });
+        player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+        // Playback status updates
+        player.addListener('player_state_changed', state => { console.log(state); });
+
+        // Ready
+        player.addListener('ready', ({ device_id }) => {
+          console.log('Ready with Device ID', device_id);
+        });
+
+        // Not Ready
+        player.addListener('not_ready', ({ device_id }) => {
+          console.log('Device ID has gone offline', device_id);
+        });
+
+        // Connect to the player!
+        player.connect();
+      };
+    </script>
+
+    <script>
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const token = "<%= raw @access_token %>";
+      const player = new Spotify.Player({
+        name: 'Web Playback SDK Quick Start Player',
+        getOAuthToken: cb => { cb(token); }
+      });
+
+      // Error handling
+      player.addListener('initialization_error', ({ message }) => { console.error(message); });
+      player.addListener('authentication_error', ({ message }) => { console.error(message); });
+      player.addListener('account_error', ({ message }) => { console.error(message); });
+      //player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+      // Playback status updates
+      player.addListener('player_state_changed', state => { console.log(state); });
+
+      // Ready
+      player.addListener('ready', ({ device_id }) => {
+        browser_device(device_id);
+
+        var player = new Spotify.Player({
+          name: 'Carly Rae Jepsen Player',
+          getOAuthToken: callback => {
+            // Run code to get a fresh access token
+            callback("<%= raw @access_token %>");
+          },
+          volume: 0.5
+        });
+
+        player.connect();
+
+        player.resume();
+      });
+
+      // Connect to the player!
+      player.connect();
+
+      // Resume playing
+      player.resume();
+
+      console.log("here");
+    };
+
+    
+  </script>
+
+  <a onclick="play()">Play</a>
+  <a onclick="pause()">Pause</a>
+  </body>
+</html>

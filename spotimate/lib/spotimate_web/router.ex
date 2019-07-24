@@ -11,6 +11,7 @@ defmodule SpotimateWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
   end
 
   scope "/", SpotimateWeb do
@@ -18,20 +19,31 @@ defmodule SpotimateWeb.Router do
 
     get "/", PageController, :index
 
-    get "/home", PageController, :home
+    get "/user/home", PageController, :user_home
+
+    get "/user/rooms", PageController, :rooms
+
+    # TODO clean this up!
+    get "/user/rooms/:id", PageController, :room
 
     # OAuth2 Flow
     get "/login", OAuth2Controller, :login
 
     get "/callback", OAuth2Controller, :callback
+
   end
 
   scope "/api", SpotimateWeb do
     pipe_through :api
+
+    post "/player/browser_device", PlaybackController, :browser_device
+
+    post "/player/play", PlaybackController, :play
+
+    post "/player/pause", PlaybackController, :pause
+
+    get "/user/collab_playlists", SpotifyAPIController, :collab_playlists
+
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", SpotimateWeb do
-  #   pipe_through :api
-  # end
 end

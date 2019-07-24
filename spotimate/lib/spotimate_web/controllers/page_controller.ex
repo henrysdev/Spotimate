@@ -1,17 +1,25 @@
 defmodule SpotimateWeb.PageController do
   use SpotimateWeb, :controller
+  import Ecto.Query
 
   def index(conn, _params) do
-    render(conn, "login_index.html")
+    render(conn, "login.html")
   end
 
-  def home(conn, _params) do
-    access_token = get_session(conn, :access_token)
-    render(conn, "home.html")
+  def user_home(conn, _params) do
+    acc_tok = get_session(conn, :access_token)
+    ref_tok = get_session(conn, :refresh_token)
+    render(conn, :user_home, refresh_token: ref_tok, access_token: acc_tok)
   end
 
-  def fetch_session_date(conn, key) do
-    get_session(conn, key)
+  def room(conn, id) do
+    render(conn, :test_playback, access_token: get_session(conn, :access_token))
+  end
+
+  def rooms(conn, _params) do
+    user_id = get_session(conn, :user_id)    
+    user_rooms = Spotimate.Rooms.RoomsDAO.get_rooms_created_by_user(user_id)
+    render(conn, :rooms, rooms: user_rooms)
   end
 
 end

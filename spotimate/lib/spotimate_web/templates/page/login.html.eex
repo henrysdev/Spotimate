@@ -1,0 +1,9 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Spotimate - Login</title>
+  </head>
+  <body>
+    <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+  </body>
+</html>

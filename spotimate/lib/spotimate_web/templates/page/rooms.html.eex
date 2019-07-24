@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Spotimate - Rooms</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
+        integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
+        crossorigin="anonymous">
+  </head>
+  <body>
+    <ul class="pure-menu-list">
+        <%= for room <- @rooms do %>
+            <% name = room.name %>
+            <% link = "rooms/#{room.id}" %>
+            <li class="pure-menu-item">
+                <%= content_tag :a, name, class: "pure-menu-link", href: link %>
+                <%# <a href="" class="pure-menu-link"></a> %>
+            </li>
+        <% end %>
+    </ul>
+  </body>
+</html>

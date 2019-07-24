@@ -4,7 +4,7 @@ use Mix.Config
 config :spotimate, Spotimate.Repo,
   username: "postgres",
   password: "postgres",
-  database: "spotimate_dev",
+  database: "spotimate",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

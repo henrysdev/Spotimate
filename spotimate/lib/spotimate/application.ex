@@ -9,7 +9,7 @@ defmodule Spotimate.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      # Spotimate.Repo,
+      Spotimate.Repo,
       # Start the endpoint when the application starts
       SpotimateWeb.Endpoint
       # Starts a worker by calling: Spotimate.Worker.start_link(arg)
