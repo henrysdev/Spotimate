@@ -17,32 +17,28 @@ defmodule SpotimateWeb.Router do
   scope "/", SpotimateWeb do
     pipe_through :browser
 
+    # HTML Page Controller
     get "/", PageController, :index
 
     get "/user/home", PageController, :user_home
 
-    get "/user/rooms", PageController, :rooms
+    get "/user/rooms", PageController, :user_rooms
 
-    # TODO clean this up!
-    get "/user/rooms/:id", PageController, :room
+    get "user/rooms/:id", PageController, :room
 
     # OAuth2 Flow
-    get "/login", OAuth2Controller, :login
+    get "/login", AuthController, :login
 
-    get "/callback", OAuth2Controller, :callback
+    get "/callback", AuthController, :callback
 
   end
 
   scope "/api", SpotimateWeb do
     pipe_through :api
 
-    post "/player/browser_device", PlaybackController, :browser_device
+    post "/room/new", RoomController, :new_room
 
-    post "/player/play", PlaybackController, :play
-
-    post "/player/pause", PlaybackController, :pause
-
-    get "/user/collab_playlists", SpotifyAPIController, :collab_playlists
+    post "/room/listen", RoomController, :listen
 
   end
 

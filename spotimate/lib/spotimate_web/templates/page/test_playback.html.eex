@@ -9,7 +9,7 @@
       function browser_device(device_id) {
         var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
         const Http = new XMLHttpRequest();
-        const url='http://localhost:4000/api/player/browser_device';
+        const url='http://localhost:4000/api/room/listen';
         const params=`device_id=${device_id}`
         Http.open("POST", url, true);
         Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
@@ -23,7 +23,7 @@
       function play() {
         var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
         const Http = new XMLHttpRequest();
-        const url='http://localhost:4000/api/player/play';
+        const url='http://localhost:4000/api/room/play';
         Http.open("POST", url, true);
         Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
         Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
@@ -35,7 +35,7 @@
       function pause() {
         var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
         const Http = new XMLHttpRequest();
-        const url='http://localhost:4000/api/player/pause';
+        const url='http://localhost:4000/api/room/pause';
         Http.open("POST", url, true);
         Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
         Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)

@@ -10,10 +10,11 @@ defmodule Spotimate.Spotify.API do
     ]
     HTTPoison.put(url, [], headers) |> Spotimate.Utils.HTTP.handle_http_resp()
   end
-  def play_song(acc_tok, context_uri, device_id) do
+  def play_song(acc_tok, context_uri, position_ms, device_id) do
     url = "https://api.spotify.com/v1/me/player/play?device_id=#{device_id}"
     body = Poison.encode!(%{
       "context_uri" => context_uri,
+      "position_ms" => position_ms,
     })
     headers = [
       {"Authorization", "Bearer #{acc_tok}"},
@@ -38,6 +39,19 @@ defmodule Spotimate.Spotify.API do
       {"Content-Type", "application/json"},
     ]
     HTTPoison.get(url, headers) |> Spotimate.Utils.HTTP.handle_http_resp()
+  end
+
+  def recommendations(acc_tok, seed_tracks) do
+    url = "https://api.spotify.com/v1/recommendations/"
+    body = Poison.encode!(%{
+      "seed_tracks" => seed_tracks,
+      "limit"       => 100,
+    })
+    headers = [
+      {"Authorization", "Bearer #{acc_tok}"},
+      {"Content-Type", "application/json"},
+    ]
+    HTTPoison.get(url, body, headers) |> Spotimate.Utils.HTTP.handle_http_resp()
   end
   
 end

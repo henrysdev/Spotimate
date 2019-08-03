@@ -3,10 +3,9 @@ defmodule Spotimate.Rooms.Room do
   import Ecto.Changeset
 
   schema "rooms" do
+    field :name, :string
     field :creator_id, :integer
-    field :current_track, :string
-    field :next_track, :string
-    field :track_started, :utc_datetime
+    field :seed_uri, :string
 
     timestamps()
   end
@@ -14,7 +13,7 @@ defmodule Spotimate.Rooms.Room do
   @doc false
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [:creator_id, :current_track, :next_track, :track_started])
-    |> validate_required([:creator_id, :current_track, :next_track, :track_started])
+    |> cast(attrs, [:name, :creator_id, :seed_uri])
+    |> validate_required([:name, :creator_id, :seed_uri])
   end
 end

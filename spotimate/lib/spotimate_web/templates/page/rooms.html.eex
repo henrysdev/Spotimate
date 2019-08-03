@@ -7,6 +7,9 @@
         crossorigin="anonymous">
   </head>
   <body>
+    <form>
+      
+    </form>
     <ul class="pure-menu-list">
         <%= for room <- @rooms do %>
             <% name = room.name %>

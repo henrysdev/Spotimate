@@ -1,4 +1,4 @@
-defmodule SpotimateWeb.OAuth2Controller do
+defmodule SpotimateWeb.AuthController do
   use SpotimateWeb, :controller
 
   def login(conn, _params) do

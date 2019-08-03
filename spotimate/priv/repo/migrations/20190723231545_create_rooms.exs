@@ -3,10 +3,9 @@ defmodule Spotimate.Repo.Migrations.CreateRooms do
 
   def change do
     create table(:rooms) do
+      add :name, :string
+      add :seed_uri, :string
       add :creator_id, :integer
-      add :current_track, :string
-      add :next_track, :string
-      add :track_started, :utc_datetime
 
       timestamps()
     end
