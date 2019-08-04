@@ -35,4 +35,7 @@ npm-debug.log
 
 config/secrets.exs
 
+config/secret.exs
+config/spotify.exs
+
 debug

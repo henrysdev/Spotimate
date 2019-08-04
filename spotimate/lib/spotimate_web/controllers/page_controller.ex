@@ -9,9 +9,7 @@ defmodule SpotimateWeb.PageController do
   end
 
   def user_home(conn, _params) do
-    acc_tok = get_session(conn, :access_token)
-    ref_tok = get_session(conn, :refresh_token)
-    render(conn, :user_home, refresh_token: ref_tok, access_token: acc_tok)
+    render(conn, "user_home.html")
   end
 
   def user_rooms(conn, _params) do
@@ -21,8 +19,15 @@ defmodule SpotimateWeb.PageController do
   end
 
   def room(conn, %{"id" => room_id}) do
-    conn = put_session(conn, :curr_room, room_id)
-    render(conn, :test_playback, access_token: get_session(conn, :access_token))
+    if RoomsDAO.exists?(:id, room_id) do
+      conn = put_session(conn, :curr_room, room_id)
+      render(conn, :test_playback, access_token: Map.fetch!(conn.req_cookies, "spotify_access_token"))
+    else
+      conn
+      |> put_status(:not_found)
+      |> put_view(SpotimateWeb.ErrorView)
+      |> render("404.html")
+    end
   end
 
 end

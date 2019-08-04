@@ -20,7 +20,7 @@ defmodule Spotimate.MixProject do
   def application do
     [
       mod: {Spotimate.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:spotify_ex, :logger, :runtime_tools]
     ]
   end
 
@@ -43,9 +43,10 @@ defmodule Spotimate.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:httpoison, "~> 1.4"},
+      {:httpoison, "~> 1.0.0"},
       {:poison, "~> 3.1"},
       {:benchee, "~> 1.0", only: :dev},
+      {:spotify_ex, "~> 2.0.9"},
     ]
   end
 
