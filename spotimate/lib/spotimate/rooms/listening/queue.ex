@@ -13,12 +13,18 @@ defmodule Spotimate.Rooms.Listening.Queue do
 
   def pop(pid) do
     IO.puts "start next song"
-    Agent.get_and_update(pid, fn q -> 
-      {List.last(q), List.delete_at(q, length(q)-1)} end)
+    Agent.get_and_update(pid,
+      fn q -> 
+        {List.last(q), List.delete_at(q, length(q)-1)}
+      end)
   end
 
-  def peak(pid) do
+  def peek(pid) do
     Agent.get(pid, &List.last&1)
+  end
+
+  def peek_all(pid) do
+    Agent.get(pid, &(&1))
   end
 
 end

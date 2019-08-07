@@ -24,8 +24,8 @@ defmodule Spotimate.Rooms.Listening do
 
     # TODO FIX FIX FIX Build queue
     {:ok, r} = Spotify.Recommendation.get_recommendations(conn,
-      seed_tracks: Utils.String.extract_uri_id(room.seed_uri), limit: 1)
-    contents = r.tracks ++ r.tracks ++ r.tracks
+      seed_tracks: Utils.String.extract_uri_id(room.seed_uri), limit: 100)
+    contents = r.tracks
     {:ok, q_pid} = Queue.start_link([], contents)
 
     # Attach queue
@@ -53,6 +53,7 @@ defmodule Spotimate.Rooms.Listening do
       nil      -> false
       real_pid -> Process.alive?(real_pid)
     end
+
     case {plh_in_db?, plh_in_mem?} do
       {false, _}    -> {:error, "Room does not exist"}
       {true, true}  -> Playhead.fetch(playhead)

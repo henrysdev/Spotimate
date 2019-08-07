@@ -7,8 +7,6 @@
 # General application configuration
 use Mix.Config
 
-import_config "secrets.exs"
-
 import_config "secret.exs"
 import_config "spotify.exs"
 

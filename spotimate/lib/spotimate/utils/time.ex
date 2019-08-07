@@ -5,4 +5,8 @@ defmodule Spotimate.Utils.Time do
     action.()
   end
 
+  def now_utc_millis() do
+    DateTime.utc_now() |> DateTime.to_unix(:millisecond)
+  end
+
 end

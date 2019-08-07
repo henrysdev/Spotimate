@@ -15,15 +15,39 @@ defmodule SpotimateWeb.RoomController do
     # Determine if there is a live playhead process already spawned.
     playhead = Listening.obtain_playhead(conn, room_id, user_id)
 
-    # Spawn subscriber listener process and return success
-    Spotimate.Spotify.Player.play_track(acc_tok, device_id, playhead)
+    # Trigger player
+    resp = Spotimate.Spotify.Player.play_track(acc_tok, device_id, playhead)
+    resp |> IO.inspect()
 
-    json(conn, %{})
+    json(conn, Poison.encode!%{
+      "deadline_utc" => playhead.deadline_utc,
+    })
   end
 
   def new_room(conn, %{"name" => name, "seed_uri" => seed_uri}) do
     creator_id = get_session(conn, :user_id)
     Spotimate.Rooms.Listening.new_room(conn, name, creator_id, seed_uri)
+  end
+
+  def sync_playhead(conn, _params) do
+    # Persist device id with session
+    room_id = get_session(conn, :curr_room)
+    user_id = get_session(conn, :user_id)
+    acc_tok = Map.get(conn.cookies, "spotify_access_token")
+    device_id = get_session(conn, :device_id)
+
+    # Determine if there is a live playhead process already spawned.
+    playhead = Listening.obtain_playhead(conn, room_id, user_id)
+
+    # Trigger player
+    Spotimate.Spotify.Player.play_track(acc_tok, device_id, playhead)
+
+    IO.puts "DEADLINE_UTC"
+    IO.inspect playhead.deadline_utc
+
+    json(conn, Poison.encode!%{
+      "deadline_utc" => playhead.deadline_utc,
+    })
   end
 
 end

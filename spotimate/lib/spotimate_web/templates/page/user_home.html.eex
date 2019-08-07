@@ -1,12 +1,12 @@
-<section class="spt-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Spotimate" %></h1>
-  <p>A Spotify app that<br/>manages your listening experience.</p>
-</section>
-
-<section class="row">
-  <article class="column">
+<!doctype html>
+<html>
+  <head>
+    <title>Spotimate - Home</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
+        integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
+        crossorigin="anonymous">
+  </head>
+  <body>
     <a href="/user/rooms">Listening Rooms</a>
-  </article>
-  <article class="column">
-  </article>
-</section>
+  </body>
+</html>

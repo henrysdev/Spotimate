@@ -8,7 +8,7 @@ defmodule Spotimate.Utils.HTTP do
         "400 Bad Request: #{body}"
       {:ok, %HTTPoison.Response{status_code: 401, body: body}} ->
         "401 Unauthorized: #{body}"
-      _ -> {:error, nil}
+      other -> other
     end
   end
 

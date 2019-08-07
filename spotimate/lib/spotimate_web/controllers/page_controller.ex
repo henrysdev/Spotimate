@@ -14,8 +14,15 @@ defmodule SpotimateWeb.PageController do
 
   def user_rooms(conn, _params) do
     user_id = get_session(conn, :user_id)
-    user_rooms = Spotimate.Rooms.RoomsDAO.get_rooms_created_by_user(user_id)
-    render(conn, :rooms, rooms: user_rooms)
+    if is_nil(user_id) do
+      conn
+      |> put_status(:not_found)
+      |> put_view(SpotimateWeb.ErrorView)
+      |> render("404.html")
+    else
+      user_rooms = Spotimate.Rooms.RoomsDAO.get_rooms_created_by_user(user_id)
+      render(conn, :rooms, rooms: user_rooms)
+    end
   end
 
   def room(conn, %{"id" => room_id}) do

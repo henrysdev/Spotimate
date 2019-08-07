@@ -6,18 +6,58 @@
         integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
         crossorigin="anonymous">
     <script>
+      function fetch_playhead(deadline_utc) {
+        const CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>
+        function sync_play(deadline_utc, CSRF_TOKEN) {
+          // HTTP get playhead (dont care about what it returns,
+          // calling this endpoint will sync playhead)
+          const Http = new XMLHttpRequest();
+          const url='http://localhost:4000/api/room/sync_playhead';
+          Http.open("PUT", url, true);
+          Http.responseType = 'json';
+          Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+          Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
+          Http.send();
+          Http.onreadystatechange = function() {
+            if (this.readyState == 4) {
+              const jsonResp = JSON.parse(Http.response);
+              const deadline_utc = jsonResp['deadline_utc'];
+              const now = Date.now();
+              let remaining_ms = deadline_utc - now
+
+              // If deadline exceeded, check again every second
+              if (remaining_ms <= 0) {
+                remaining_ms = 1000;
+              }
+              console.log("deadline_utc: ", deadline_utc);
+              console.log("curr_utc    : ", now);
+              console.log("remaining_ms: ", remaining_ms);
+              
+              // Wait remaining time of song to update playhead
+              setTimeout(
+                () => sync_play(deadline_utc),
+              remaining_ms);
+            }
+          }
+        }
+        return sync_play(deadline_utc);
+      }
       function browser_device(device_id) {
         var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
         const Http = new XMLHttpRequest();
         const url='http://localhost:4000/api/room/listen';
         const params=`device_id=${device_id}`
         Http.open("POST", url, true);
-        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
+        Http.responseType = 'json';
+        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN);
         Http.send(params);
-        console.log('device_id: ', device_id)
-        Http.onreadystatechange = (e) => {
-          console.log(Http.responseText)
+        Http.onreadystatechange = function() {
+          if (this.readyState == 4) {
+            const jsonResp = JSON.parse(Http.response);
+            const deadline_utc = jsonResp['deadline_utc'];
+            fetch_playhead(deadline_utc);
+          }
         }
       }
     </script>
@@ -99,8 +139,6 @@
 
       // Resume playing
       player.resume();
-
-      console.log("here");
     };
   </script>
   </body>

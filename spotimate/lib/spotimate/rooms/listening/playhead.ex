@@ -4,9 +4,9 @@ defmodule Spotimate.Rooms.Listening.Playhead do
   alias Spotimate.Rooms.Listening.Queue
   alias Spotimate.Utils.Time
 
-  defstruct song: %Spotify.Track{},
+  defstruct track: %Spotify.Track{},
             position_ms: 0,
-            start_time: 0,
+            deadline_utc: 0,
             time_calculated: 0,
             queue_pid: nil
 
@@ -26,39 +26,37 @@ defmodule Spotimate.Rooms.Listening.Playhead do
 
   # Recursive play loop
   def play(pid, queue_pid) do
-    song = Queue.pop(queue_pid)
-    %Spotify.Track{
-      duration_ms: duration_ms,
-    } = song
-    IO.puts "duration MS"
-    IO.inspect duration_ms
+    track = Queue.pop(queue_pid)
     
     # Start track
-    start_track(pid, :os.system_time(:millisecond), song)
+    IO.inspect({"duration_ms: ", track.duration_ms})
+    deadline_utc = Time.now_utc_millis() + track.duration_ms
+    IO.inspect({"deadline_utc: ", deadline_utc})
+    start_track(pid, deadline_utc, track)
 
     # Spawn timer process for track duration
     spawn fn ->
-      Time.delayed_action(duration_ms, fn -> play(pid, queue_pid) end)
+      Time.delayed_action(track.duration_ms, fn -> play(pid, queue_pid) end)
     end
   end
 
-  defp start_track(pid, start_time, song) do
-    Agent.update(pid, &Map.put(&1, "start_time", start_time))
-    Agent.update(pid, &Map.put(&1, "song", song))
+  defp start_track(pid, deadline_utc, track) do
+    Agent.update(pid, &Map.put(&1, "deadline_utc", deadline_utc))
+    Agent.update(pid, &Map.put(&1, "track", track))
   end
 
   def fetch(pid) do
-    song       = Agent.get(pid, &Map.get(&1, "song"))
-    start_time = Agent.get(pid, &Map.get(&1, "start_time"))
-    queue_pid      = Agent.get(pid, &Map.get(&1, "queue_pid"))
-    now = :os.system_time(:millisecond)
-    position_ms = now - start_time
-    if position_ms < song.duration_ms do
+    track        = Agent.get(pid, &Map.get(&1, "track"))
+    deadline_utc = Agent.get(pid, &Map.get(&1, "deadline_utc"))
+    now_utc = Time.now_utc_millis()
+    position_ms = track.duration_ms - (deadline_utc - now_utc)
+    IO.inspect({"position_ms: ", position_ms, "deadline_utc: ", deadline_utc})
+    if position_ms < track.duration_ms do
       %Playhead{
-        song:            song,
+        track:           track,
         position_ms:     position_ms,
-        start_time:      start_time,
-        time_calculated: now,
+        deadline_utc:    deadline_utc,
+        time_calculated: now_utc,
       }
     else
      {:error, "Expired Playhead"}

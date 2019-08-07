@@ -3,17 +3,12 @@ defmodule Spotimate.Spotify.Player do
   
   def play_track(acc_tok, device_id, %Playhead{} = playhead) do
     %Playhead{
-      song: %Spotify.Track{
-        uri: uri,
-      },
+      track:       track,
       position_ms: position_ms,
     } = playhead
     url = "https://api.spotify.com/v1/me/player/play?device_id=#{device_id}"
-    IO.inspect uri
-    IO.inspect device_id
-    IO.inspect position_ms
     body = Poison.encode!(%{
-      "uris" => [uri],
+      "uris"        => [track.uri],
       "position_ms" => position_ms,
     })
     headers = [

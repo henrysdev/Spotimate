@@ -40,6 +40,8 @@ defmodule SpotimateWeb.Router do
 
     post "/room/listen", RoomController, :listen
 
+    put "/room/sync_playhead", RoomController, :sync_playhead
+
   end
 
 end
