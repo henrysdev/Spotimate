@@ -1,7 +1,10 @@
 defmodule Spotimate.Rooms.RoomsDAO do
-  alias Spotimate.Repo
-  alias Spotimate.Rooms.Room
   import Ecto.Query
+
+  alias Spotimate.{
+    Repo,
+    Rooms.Room,
+  }
 
   def exists?(:id, val) do
     Repo.exists?(from r in Room, where: r.id == ^val)
@@ -15,6 +18,6 @@ defmodule Spotimate.Rooms.RoomsDAO do
     {:ok, room} = Repo.insert(room)
   end
 
-  def fetch_by_attr(:id, val), do: Repo.get_by(Room, id: val)
+  def fetch_by_id(id), do: Repo.get_by(Room, id: id)
 
 end

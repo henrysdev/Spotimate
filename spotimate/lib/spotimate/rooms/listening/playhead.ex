@@ -1,8 +1,11 @@
 defmodule Spotimate.Rooms.Listening.Playhead do
   use Agent
-  alias Spotimate.Rooms.Listening.Playhead
-  alias Spotimate.Rooms.Listening.Queue
-  alias Spotimate.Utils.Time
+  
+  alias Spotimate.{
+    Rooms.Listening.Playhead,
+    Rooms.Listening.Queue,
+    Utils.Time,
+  }
 
   defstruct track: %Spotify.Track{},
             position_ms: 0,

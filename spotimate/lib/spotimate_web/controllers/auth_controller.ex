@@ -1,7 +1,10 @@
 defmodule SpotimateWeb.AuthController do
   use SpotimateWeb, :controller
-  alias Spotimate.Accounts.User
-  alias Spotimate.Accounts.Auth
+
+  alias Spotimate.Accounts.{
+    User,
+    Auth,
+  }
 
   def login(conn, _params) do
     redirect conn, external: Spotify.Authorization.url
@@ -19,7 +22,7 @@ defmodule SpotimateWeb.AuthController do
                 |> put_session(:user_id, id)
                 |> put_session(:username, username)
                 |> put_session(:email, email)
-                |> redirect(to: "/user/home")
+                |> redirect(to: "/home")
           _ -> redirect conn, to: "/error"
         end
       {:error, reason, conn} -> redirect conn, to: "/error"

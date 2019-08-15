@@ -1,7 +1,10 @@
 defmodule Spotimate.Rooms.Listening.Queue do
   use Agent
-  alias Spotimate.Rooms.Listening.Playhead
-  alias Spotimate.Rooms.Listening.Queue
+  
+  alias Spotimate.Rooms.Listening.{
+    Playhead,
+    Queue,
+  }
 
   def start_link(_opts, init_contents \\ []) do
     Agent.start_link(fn -> init_contents end)

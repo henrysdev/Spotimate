@@ -1,6 +1,19 @@
 defmodule Spotimate.Accounts.Auth do
-  alias Spotimate.Accounts.UsersDAO
-  alias Spotimate.Accounts.User
+  alias Spotimate.Accounts.{
+    UsersDAO,
+    User,
+  }
+
+  def login(username) do
+    UsersDAO.fetch_by_username(username)
+  end
+
+  def register(username, email) do
+    UsersDAO.insert(%User{
+        username: username,
+        email:    email,
+    })
+  end
 
   def login_or_register(conn) do
     {:ok, %Spotify.Profile{
@@ -8,12 +21,9 @@ defmodule Spotimate.Accounts.Auth do
       email: email,
     }} = Spotify.Profile.me(conn)
     if UsersDAO.exists?(:username, username) do
-      UsersDAO.fetch_by_attr(:username, username)
+      login(username)
     else
-      UsersDAO.insert(%User{
-        username: username,
-        email:    email,
-      })
+      register(username, email)
     end
   end
 

@@ -1,23 +1,26 @@
 <!doctype html>
 <html>
   <head>
-    <title>Spotimate - TEST PLAYBACK</title>
+    <title>Spotimate - <%= @room_name %></title>
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
         integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
         crossorigin="anonymous">
     <script>
-      function fetch_playhead(deadline_utc) {
-        const CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>
-        function sync_play(deadline_utc, CSRF_TOKEN) {
-          // HTTP get playhead (dont care about what it returns,
-          // calling this endpoint will sync playhead)
-          const Http = new XMLHttpRequest();
-          const url='http://localhost:4000/api/room/sync_playhead';
-          Http.open("PUT", url, true);
-          Http.responseType = 'json';
-          Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-          Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN)
-          Http.send();
+      function sync_playhead(device_id) {
+        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
+        const Http = new XMLHttpRequest();
+        const url='http://localhost:4000/api/room/listen';
+        const params=`device_id=${device_id}`
+        Http.open("POST", url, true);
+        Http.responseType = 'json';
+        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN);
+        Http.send(params);
+        return Http;
+      }
+      function fetch_playhead(device_id) {
+        function play_loop() {
+          Http = sync_playhead(device_id);
           Http.onreadystatechange = function() {
             if (this.readyState == 4) {
               const jsonResp = JSON.parse(Http.response);
@@ -30,35 +33,16 @@
                 remaining_ms = 1000;
               }
               console.log("deadline_utc: ", deadline_utc);
-              console.log("curr_utc    : ", now);
               console.log("remaining_ms: ", remaining_ms);
               
               // Wait remaining time of song to update playhead
               setTimeout(
-                () => sync_play(deadline_utc),
+                () => play_loop(),
               remaining_ms);
             }
           }
         }
-        return sync_play(deadline_utc);
-      }
-      function browser_device(device_id) {
-        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
-        const Http = new XMLHttpRequest();
-        const url='http://localhost:4000/api/room/listen';
-        const params=`device_id=${device_id}`
-        Http.open("POST", url, true);
-        Http.responseType = 'json';
-        Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN);
-        Http.send(params);
-        Http.onreadystatechange = function() {
-          if (this.readyState == 4) {
-            const jsonResp = JSON.parse(Http.response);
-            const deadline_utc = jsonResp['deadline_utc'];
-            fetch_playhead(deadline_utc);
-          }
-        }
+        return play_loop();
       }
     </script>
   </head>
@@ -118,7 +102,7 @@
 
       // Ready
       player.addListener('ready', ({ device_id }) => {
-        browser_device(device_id);
+        fetch_playhead(device_id);
 
         var player = new Spotify.Player({
           name: 'Spotimate Player',

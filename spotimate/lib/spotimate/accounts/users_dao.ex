@@ -1,7 +1,10 @@
 defmodule Spotimate.Accounts.UsersDAO do
-  alias Spotimate.Repo
-  alias Spotimate.Accounts.User
   import Ecto.Query
+
+  alias Spotimate.{
+    Repo,
+    Accounts.User,
+  }
 
   def exists?(:username, val) do
     Repo.exists?(from u in User, where: ilike(u.username, ^val))
@@ -17,8 +20,7 @@ defmodule Spotimate.Accounts.UsersDAO do
     {:ok, user_record} = Repo.insert(user)
   end
 
-  def fetch_by_attr(:username, val), do: Repo.get_by(User, username: val)
-  def fetch_by_attr(:email, val), do: Repo.get_by(User, email: val)
-  def fetch_by_attr(:id, val), do: Repo.get_by(User, id: val)
+  def fetch_by_username(username), do: Repo.get_by(User, username: username)
+  def fetch_by_id(id), do: Repo.get_by(User, id: id)
 
 end

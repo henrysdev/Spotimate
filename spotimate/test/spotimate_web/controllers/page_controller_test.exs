@@ -1,10 +1,14 @@
 defmodule SpotimateWeb.PageControllerTest do
   use SpotimateWeb.ConnCase
+  
   import Plug.Test
-  alias Spotimate.Rooms.Room
-  alias Spotimate.Rooms.RoomsDAO
-  alias Spotimate.Accounts.User
-  alias Spotimate.Accounts.UsersDAO
+
+  alias Spotimate.{
+    Rooms.Room,
+    Rooms.RoomsDAO,
+    Accounts.User,
+    Accounts.UsersDAO,
+  }
 
   defp dummy_user() do
     test_user = %User{email: "blabla@gmail.com", username: "gertrude"}
@@ -19,41 +23,36 @@ defmodule SpotimateWeb.PageControllerTest do
     [room1, room2]
   end
 
-
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
     assert html_response(conn, 200) =~ "Spotimate - Login"
   end
 
-  test "GET /user/home", %{conn: conn} do
-    conn = get(conn, "/user/home")
+  test "GET /home", %{conn: conn} do
+    conn = get(conn, "/home")
     assert html_response(conn, 200) =~ "Spotimate - Home"
   end
 
-  test "GET /user/rooms", %{conn: conn} do
+  test "GET /rooms", %{conn: conn} do
     user = dummy_user()
     rooms = dummy_rooms(user.id)
-    conn = conn
-    |> init_test_session(foo: "bar")
-    |> put_session(:user_id, 0)
-    |> get("/user/rooms")
+    conn = init_test_session(conn, user_id: user.id)
+    |> get("/rooms")
     assert html_response(conn, 200) =~ "Spotimate - Rooms"
+    Enum.each(rooms, fn r -> assert(html_response(conn, 200)) =~ r.name end)
   end
 
-  test "GET /user/rooms with no valid user_id", %{conn: conn} do
-    conn = get(conn, "/user/rooms")
+  test "GET /rooms with no valid user_id", %{conn: conn} do
+    conn = get(conn, "/rooms")
     assert html_response(conn, 404) =~ "Not Found"
   end
 
-  test "GET /user/rooms/:id", %{conn: conn} do
+  test "GET /rooms/:id", %{conn: conn} do
     user = dummy_user()
-    [room1, room2] = dummy_rooms(user.id)
-    # conn = conn
-    # |> init_test_session(foo: "bar")
-    # |> put_session("spotify_access_token", "asdf")
-    # |> get("/user/rooms/#{room1.id}")
+    [room, _] = dummy_rooms(user.id)
+    conn = init_test_session(conn, foo: "bar")
+    |> get("/rooms/#{room.id}")
+    assert html_response(conn, 200) =~ "Spotimate - #{room.name}"
   end
-
-  
 
 end

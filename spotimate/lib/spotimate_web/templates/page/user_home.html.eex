@@ -7,6 +7,6 @@
         crossorigin="anonymous">
   </head>
   <body>
-    <a href="/user/rooms">Listening Rooms</a>
+    <a href="/rooms">Listening Rooms</a>
   </body>
 </html>

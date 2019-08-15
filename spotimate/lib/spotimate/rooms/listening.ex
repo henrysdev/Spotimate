@@ -1,9 +1,11 @@
 defmodule Spotimate.Rooms.Listening do
-  alias Spotimate.Rooms.Room
-  alias Spotimate.Rooms.RoomsDAO
-  alias Spotimate.Rooms.Listening.Playhead
-  alias Spotimate.Rooms.Listening.Queue
-  alias Spotimate.Utils
+  alias Spotimate.{
+    Rooms.Room,
+    Rooms.RoomsDAO,
+    Rooms.Listening.Playhead,
+    Rooms.Listening.Queue,
+    Utils,
+  }
 
   # TODO Move somewhere else? Rename?
   def new_room(conn, name, creator_id, seed_uri) do
@@ -42,7 +44,7 @@ defmodule Spotimate.Rooms.Listening do
 
   def restart_playhead(conn, room_id) do
     # Fetch room from DB
-    room = RoomsDAO.fetch_by_attr(:id, room_id)
+    room = RoomsDAO.fetch_by_id(room_id)
     start_playhead(conn, room)
   end
 

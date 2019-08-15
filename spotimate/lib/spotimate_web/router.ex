@@ -20,11 +20,11 @@ defmodule SpotimateWeb.Router do
     # HTML Page Controller
     get "/", PageController, :index
 
-    get "/user/home", PageController, :user_home
+    get "/home", PageController, :user_home
 
-    get "/user/rooms", PageController, :user_rooms
+    get "/rooms", PageController, :user_rooms
 
-    get "user/rooms/:id", PageController, :room
+    get "/rooms/:id", PageController, :room
 
     # OAuth2 Flow
     get "/login", AuthController, :login
