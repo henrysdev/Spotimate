@@ -1,9 +1,9 @@
-defmodule Spotimate.Rooms.RoomsDAO do
+defmodule Spotimate.Listening.DataModel.RoomsDAO do
   import Ecto.Query
 
   alias Spotimate.{
     Repo,
-    Rooms.Room,
+    Listening.DataModel.Room,
   }
 
   def exists?(:id, val) do

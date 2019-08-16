@@ -1,4 +1,4 @@
-defmodule Spotimate.Rooms.Room do
+defmodule Spotimate.Listening.DataModel.Room do
   use Ecto.Schema
   import Ecto.Changeset
 

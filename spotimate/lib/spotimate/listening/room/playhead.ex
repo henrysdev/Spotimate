@@ -1,9 +1,9 @@
-defmodule Spotimate.Rooms.Listening.Playhead do
+defmodule Spotimate.Listening.Room.Playhead do
   use Agent
   
   alias Spotimate.{
-    Rooms.Listening.Playhead,
-    Rooms.Listening.Queue,
+    Listening.Room.Queue,
+    Listening.Room.Playhead,
     Utils.Time,
   }
 
@@ -24,22 +24,24 @@ defmodule Spotimate.Rooms.Listening.Playhead do
   # Entry point to playing
   def init(pid) do
     queue_pid = Agent.get(pid, &Map.get(&1, "queue_pid"))
-    play(pid, queue_pid)
+    play_next(pid, queue_pid)
   end
 
   # Recursive play loop
-  def play(pid, queue_pid) do
-    track = Queue.pop(queue_pid)
-    
-    # Start track
-    IO.inspect({"duration_ms: ", track.duration_ms})
-    deadline_utc = Time.now_utc_millis() + track.duration_ms
-    IO.inspect({"deadline_utc: ", deadline_utc})
-    start_track(pid, deadline_utc, track)
+  def play_next(pid, queue_pid, counter \\ 0) do
+    case Queue.pop(queue_pid) do
+      %Spotify.Track{} = track ->
+        # Start track
+        deadline_utc = Time.now_utc_millis() + track.duration_ms
+        start_track(pid, deadline_utc, track)
+        # Spawn timer process for track duration
+        spawn fn ->
+          Time.delayed_action(track.duration_ms, fn ->
+            play_next(pid, queue_pid, counter + 1)
+          end)
+        end
 
-    # Spawn timer process for track duration
-    spawn fn ->
-      Time.delayed_action(track.duration_ms, fn -> play(pid, queue_pid) end)
+      _ -> {:error, "Queue Exhausted. Track Counter: #{counter}"}
     end
   end
 
@@ -53,7 +55,6 @@ defmodule Spotimate.Rooms.Listening.Playhead do
     deadline_utc = Agent.get(pid, &Map.get(&1, "deadline_utc"))
     now_utc = Time.now_utc_millis()
     position_ms = track.duration_ms - (deadline_utc - now_utc)
-    IO.inspect({"position_ms: ", position_ms, "deadline_utc: ", deadline_utc})
     if position_ms < track.duration_ms do
       %Playhead{
         track:           track,
@@ -62,6 +63,7 @@ defmodule Spotimate.Rooms.Listening.Playhead do
         time_calculated: now_utc,
       }
     else
+      # Have process die / supervisor replace
      {:error, "Expired Playhead"}
     end
   end

@@ -1,7 +1,7 @@
 defmodule Spotimate.Spotify.Player do
-  alias Spotimate.Rooms.Listening.Playhead
+  alias Spotimate.Listening.Room.Playhead
   
-  def play_track(acc_tok, device_id, %Playhead{} = playhead) do
+  def play_track(%Playhead{} = playhead, acc_tok, device_id) do
     %Playhead{
       track:       track,
       position_ms: position_ms,

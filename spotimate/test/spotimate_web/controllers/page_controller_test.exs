@@ -4,10 +4,10 @@ defmodule SpotimateWeb.PageControllerTest do
   import Plug.Test
 
   alias Spotimate.{
-    Rooms.Room,
-    Rooms.RoomsDAO,
-    Accounts.User,
-    Accounts.UsersDAO,
+    Listening.DataModel.Room,
+    Listening.DataModel.RoomsDAO,
+    Accounts.DataModel.User,
+    Accounts.DataModel.UsersDAO,
   }
 
   defp dummy_user() do

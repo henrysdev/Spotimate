@@ -2,7 +2,7 @@ defmodule SpotimateWeb.AuthController do
   use SpotimateWeb, :controller
 
   alias Spotimate.Accounts.{
-    User,
+    DataModel.User,
     Auth,
   }
 

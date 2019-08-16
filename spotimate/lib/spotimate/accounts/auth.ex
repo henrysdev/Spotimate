@@ -1,5 +1,5 @@
 defmodule Spotimate.Accounts.Auth do
-  alias Spotimate.Accounts.{
+  alias Spotimate.Accounts.DataModel.{
     UsersDAO,
     User,
   }

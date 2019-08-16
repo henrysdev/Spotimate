@@ -1,4 +1,4 @@
-defmodule Spotimate.Accounts.User do
+defmodule Spotimate.Accounts.DataModel.User do
   use Ecto.Schema
   import Ecto.Changeset
 

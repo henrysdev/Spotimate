@@ -3,8 +3,9 @@ defmodule SpotimateWeb.PageController do
   import Ecto.Query
 
   alias Spotimate.{
-    Rooms.Listening,
-    Rooms.RoomsDAO,
+    Listening.Room,
+    Listening.DataModel.RoomsDAO,
+    Utils,
   }
 
   def index(conn, _params) do

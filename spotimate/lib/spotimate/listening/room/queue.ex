@@ -1,13 +1,13 @@
-defmodule Spotimate.Rooms.Listening.Queue do
+defmodule Spotimate.Listening.Room.Queue do
   use Agent
   
-  alias Spotimate.Rooms.Listening.{
+  alias Spotimate.Listening.Room.{
     Playhead,
     Queue,
   }
 
-  def start_link(_opts, init_contents \\ []) do
-    Agent.start_link(fn -> init_contents end)
+  def start_link(_opts, init_tracks \\ []) do
+    Agent.start_link(fn -> init_tracks end)
   end
 
   def push(pid, %Spotify.Track{} = song) do

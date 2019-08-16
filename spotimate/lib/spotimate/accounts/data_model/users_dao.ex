@@ -1,9 +1,9 @@
-defmodule Spotimate.Accounts.UsersDAO do
+defmodule Spotimate.Accounts.DataModel.UsersDAO do
   import Ecto.Query
 
   alias Spotimate.{
     Repo,
-    Accounts.User,
+    Accounts.DataModel.User,
   }
 
   def exists?(:username, val) do
