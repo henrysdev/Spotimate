@@ -7,16 +7,13 @@
         crossorigin="anonymous">
   </head>
   <body>
-    <form>
-      
-    </form>
+    <%= render SpotimateWeb.ComponentView, "top_nav.html", conn: @conn %>
     <ul class="pure-menu-list">
         <%= for room <- @rooms do %>
             <% name = room.name %>
             <% link = "rooms/#{room.id}" %>
             <li class="pure-menu-item">
                 <%= content_tag :a, name, class: "pure-menu-link", href: link %>
-                <%# <a href="" class="pure-menu-link"></a> %>
             </li>
         <% end %>
     </ul>

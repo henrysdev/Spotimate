@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="en">
+  <a href="/" class="spt-logo">
+    <img src="<%= Routes.static_path(@conn, "/images/spotimate.png") %>" alt="Spotimate Logo"/>
+  </a>
+</html>

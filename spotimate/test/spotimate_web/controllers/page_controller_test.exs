@@ -23,16 +23,33 @@ defmodule SpotimateWeb.PageControllerTest do
     [room1, room2]
   end
 
-  test "GET /", %{conn: conn} do
+  # Login
+  test "GET / with no valid session prompts login", %{conn: conn} do
     conn = get(conn, "/")
     assert html_response(conn, 200) =~ "Spotimate - Login"
   end
 
-  test "GET /home", %{conn: conn} do
-    conn = get(conn, "/home")
+  test "GET / with valid session redirects to home", %{conn: conn} do
+    user = dummy_user()
+    conn = init_test_session(conn, user_id: user.id)
+    |> get("/")
     assert html_response(conn, 200) =~ "Spotimate - Home"
   end
 
+  # Home
+  test "GET /home", %{conn: conn} do
+    user = dummy_user()
+    conn = init_test_session(conn, user_id: user.id)
+    |> get("/home")
+    assert html_response(conn, 200) =~ "Spotimate - Home"
+  end
+
+  test "GET /home with no valid session prompts login", %{conn: conn} do
+    conn = get(conn, "/home")
+    assert html_response(conn, 200) =~ "Spotimate - Login"
+  end
+
+  # User Rooms
   test "GET /rooms", %{conn: conn} do
     user = dummy_user()
     rooms = dummy_rooms(user.id)
@@ -42,17 +59,29 @@ defmodule SpotimateWeb.PageControllerTest do
     Enum.each(rooms, fn r -> assert(html_response(conn, 200)) =~ r.name end)
   end
 
-  test "GET /rooms with no valid user_id", %{conn: conn} do
+  test "GET /rooms with no valid session prompts login", %{conn: conn} do
     conn = get(conn, "/rooms")
-    assert html_response(conn, 404) =~ "Not Found"
+    assert html_response(conn, 200) =~ "Spotimate - Login"
   end
 
+  # Room
   test "GET /rooms/:id", %{conn: conn} do
     user = dummy_user()
     [room, _] = dummy_rooms(user.id)
-    conn = init_test_session(conn, foo: "bar")
+    conn = init_test_session(conn, user_id: user.id)
     |> get("/rooms/#{room.id}")
     assert html_response(conn, 200) =~ "Spotimate - #{room.name}"
+  end
+
+  test "GET /rooms/:id with no valid room id returns not found", %{conn: conn} do
+    user = dummy_user()
+    conn = init_test_session(conn, user_id: user.id)
+    |> get("/rooms/123")
+  end
+
+  test "GET /rooms/:id with no valid session prompts login", %{conn: conn} do
+    conn = get(conn, "/rooms/123")
+    assert html_response(conn, 200) =~ "Spotimate - Login"
   end
 
 end

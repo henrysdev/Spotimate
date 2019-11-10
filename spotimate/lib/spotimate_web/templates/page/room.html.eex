@@ -5,28 +5,30 @@
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css"
         integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47"
         crossorigin="anonymous">
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script>
-      function sync_playhead(device_id) {
-        var CSRF_TOKEN = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>;
+      // Fetch most recent playhead from server
+      function fetch_playhead(device_id, csrf_token) {
         const Http = new XMLHttpRequest();
         const url='http://localhost:4000/api/room/listen';
         const params=`device_id=${device_id}`
         Http.open("POST", url, true);
         Http.responseType = 'json';
         Http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        Http.setRequestHeader('X-CSRF-Token', CSRF_TOKEN);
+        Http.setRequestHeader('X-CSRF-Token', csrf_token);
         Http.send(params);
         return Http;
       }
-      function fetch_playhead(device_id) {
+
+      // While listener remains on page, play through
+      function sync_playhead(device_id, csrf_token) {
+        // Simulate tail-call optimization to prevent stack overflow
         function play_loop() {
-          Http = sync_playhead(device_id);
+          Http = fetch_playhead(device_id, csrf_token);
           Http.onreadystatechange = function() {
             if (this.readyState == 4) {
-              const jsonResp = JSON.parse(Http.response);
-              const deadline_utc = jsonResp['deadline_utc'];
-              const now = Date.now();
-              let remaining_ms = deadline_utc - now
+              const deadline_utc = JSON.parse(Http.response)['deadline_utc'];
+              let remaining_ms = deadline_utc -  Date.now()
 
               // If deadline exceeded, check again every second
               if (remaining_ms <= 0) {
@@ -44,19 +46,13 @@
         }
         return play_loop();
       }
-    </script>
-  </head>
-  <body>
-
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
-
-
-    <script>
+      
       window.onSpotifyWebPlaybackSDKReady = () => {
-        const token = 'BQChV-7oruE6ErOAzYVWTbDEHyKxeS1dUnhWVtQHS0J-pugzVl3KrOVwabqfIBHxZBGxqIs8OwTHFH6L3xUZWJLN8mA3pI0FPdgf-5hmtNWwKZyqDcwV0WHdERaMhK7CP5U9hq-jD8fJp2FIYUqtz26NOCLx2slE-JekwQTAC8RQ';
+        const access_token = "<%= raw @access_token %>";
+        const csrf_token = <%= raw Poison.encode!(Plug.CSRFProtection.get_csrf_token()) %>
         const player = new Spotify.Player({
-          name: 'Web Playback SDK Quick Start Player',
-          getOAuthToken: cb => { cb(token); }
+          name: 'Spotimate Player',
+          getOAuthToken: cb => { cb(access_token); }
         });
 
         // Error handling
@@ -70,60 +66,23 @@
 
         // Ready
         player.addListener('ready', ({ device_id }) => {
-          console.log('Ready with Device ID', device_id);
+          
+          sync_playhead(device_id, csrf_token);
+          var player = new Spotify.Player({
+            name: 'Spotimate Player',
+            getOAuthToken: callback => {
+              // Run code to get a fresh access token
+              callback(access_token);
+            },
+            volume: 1.0
+          });
         });
-
-        // Not Ready
-        player.addListener('not_ready', ({ device_id }) => {
-          console.log('Device ID has gone offline', device_id);
-        });
-
-        // Connect to the player!
         player.connect();
+        player.resume();
       };
     </script>
-
-    <script>
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      const token = "<%= raw @access_token %>";
-      const player = new Spotify.Player({
-        name: 'Web Playback SDK Quick Start Player',
-        getOAuthToken: cb => { cb(token); }
-      });
-
-      // Error handling
-      player.addListener('initialization_error', ({ message }) => { console.error(message); });
-      player.addListener('authentication_error', ({ message }) => { console.error(message); });
-      player.addListener('account_error', ({ message }) => { console.error(message); });
-      //player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-      // Playback status updates
-      player.addListener('player_state_changed', state => { console.log(state); });
-
-      // Ready
-      player.addListener('ready', ({ device_id }) => {
-        fetch_playhead(device_id);
-
-        var player = new Spotify.Player({
-          name: 'Spotimate Player',
-          getOAuthToken: callback => {
-            // Run code to get a fresh access token
-            callback("<%= raw @access_token %>");
-          },
-          volume: 0.5
-        });
-
-        player.connect();
-
-        player.resume();
-      });
-
-      // Connect to the player!
-      player.connect();
-
-      // Resume playing
-      player.resume();
-    };
-  </script>
+  </head>
+  <body>
+    <%= render SpotimateWeb.ComponentView, "top_nav.html", conn: @conn %>
   </body>
 </html>

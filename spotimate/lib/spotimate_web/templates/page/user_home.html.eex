@@ -7,6 +7,7 @@
         crossorigin="anonymous">
   </head>
   <body>
+    <%= render SpotimateWeb.ComponentView, "top_nav.html", conn: @conn %>
     <a href="/rooms">Listening Rooms</a>
   </body>
 </html>
