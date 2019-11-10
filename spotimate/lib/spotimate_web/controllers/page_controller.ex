@@ -5,13 +5,13 @@ defmodule SpotimateWeb.PageController do
   alias Spotimate.{
     Listening.Room,
     Listening.DataModel.RoomsDAO,
-    Utils,
+    Utils
   }
 
   # TODO move to utils or change into decorator-style macro
   defp logged_in?(conn) do
     case get_session(conn, :user_id) do
-      nil     -> false
+      nil -> false
       user_id -> true
     end
   end
@@ -48,7 +48,11 @@ defmodule SpotimateWeb.PageController do
       if RoomsDAO.exists?(:id, room_id) do
         conn = put_session(conn, :curr_room, room_id)
         room = RoomsDAO.fetch_by_id(room_id)
-        render(conn, :room, room_name: room.name, access_token: Spotify.Cookies.get_access_token(conn))
+
+        render(conn, :room,
+          room_name: room.name,
+          access_token: Spotify.Cookies.get_access_token(conn)
+        )
       else
         conn
         |> put_status(:not_found)
@@ -59,5 +63,4 @@ defmodule SpotimateWeb.PageController do
       render(conn, "login.html")
     end
   end
-
 end

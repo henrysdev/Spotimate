@@ -48,6 +48,7 @@ defmodule Spotimate.MixProject do
       {:poison, "~> 3.1"},
       {:benchee, "~> 1.0", only: :dev},
       {:spotify_ex, "~> 2.0.9"},
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

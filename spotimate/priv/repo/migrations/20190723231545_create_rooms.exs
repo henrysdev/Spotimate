@@ -9,6 +9,5 @@ defmodule Spotimate.Repo.Migrations.CreateRooms do
 
       timestamps()
     end
-
   end
 end

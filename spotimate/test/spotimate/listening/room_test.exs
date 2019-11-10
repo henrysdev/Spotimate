@@ -1,13 +1,13 @@
 defmodule Spotimate.Listening.RoomTest do
   use SpotimateWeb.ConnCase
-  
+
   import Plug.Test
 
   alias Spotimate.{
     Accounts.DataModel.User,
     Accounts.DataModel.UsersDAO,
     Listening.DataModel,
-    Listening.Room,
+    Listening.Room
   }
 
   defp dummy_user() do
@@ -31,5 +31,4 @@ defmodule Spotimate.Listening.RoomTest do
       Room.spawn_room(conn, room.id, :static)
     end
   end
-
 end
