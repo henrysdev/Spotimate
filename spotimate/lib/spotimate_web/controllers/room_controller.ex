@@ -4,46 +4,43 @@ defmodule SpotimateWeb.RoomController do
   alias Spotimate.{
     Listening.Room,
     Listening.DataModel,
-    Listening.RecGenerators,
     Spotify.Player,
-    Utils,
+    Utils
   }
 
   def new_room(conn, %{"name" => name, "seed_uri" => seed_uri}) do
     creator_id = get_session(conn, :user_id)
-    
+
     # Create and persist new room
     %DataModel.Room{
-      id:       id,
-      seed_uri: seed_uri,
+      id: id
     } = Room.new_room(name, creator_id, seed_uri)
 
     # Spawn process for newly created room
-    Room.spawn_room(conn, id, :default)
+    Room.spawn_room(conn, id)
   end
 
-  def listen(conn, %{"device_id" => device_id}) do
+  def listen(conn, %{"device_id" => device_id, "room_id" => room_id}) do
     # Persist device id with session
     conn = put_session(conn, :device_id, device_id)
 
     # Fetch applicable session data
     acc_tok = Spotify.Cookies.get_access_token(conn)
-    %{
-      :curr_room => room_id,
-      :user_id   => user_id,
-      :device_id => device_id,
-    } = Utils.Session.fetch_multiple(conn, [:curr_room, :user_id, :device_id])
+
+    device_id = get_session(conn, :device_id)
 
     # Get playhead
-    playhead = Room.obtain_playhead(conn, room_id, user_id)
-    
+    playhead = Room.obtain_playhead(conn, room_id)
+
     # Start playing track
     Player.play_track(playhead, acc_tok, device_id)
 
     # Return next deadline
-    json(conn, Poison.encode!%{
-      "deadline_utc" => playhead.deadline_utc,
-    })
+    json(
+      conn,
+      Poison.encode!(%{
+        "deadline_utc" => playhead.deadline_utc
+      })
+    )
   end
-
 end

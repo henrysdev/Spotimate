@@ -1,13 +1,22 @@
 defmodule Spotimate.Listening.RoomTest do
   use SpotimateWeb.ConnCase
-  
-  import Plug.Test
+
+  import Mock
 
   alias Spotimate.{
     Accounts.DataModel.User,
     Accounts.DataModel.UsersDAO,
     Listening.DataModel,
-    Listening.Room,
+    Listening.Room
+  }
+
+  @mocked_recs %Spotify.Recommendation{
+    tracks: [
+      %Spotify.Track{
+        name: "Foo",
+        duration_ms: 2000
+      }
+    ]
   }
 
   defp dummy_user() do
@@ -17,7 +26,7 @@ defmodule Spotimate.Listening.RoomTest do
   end
 
   describe "new room" do
-    test "create a new room", %{conn: conn} do
+    test "create a new room", %{conn: _conn} do
       user = dummy_user()
       room = Room.new_room("cool people only", user.id, "reallygoodtrack")
       assert DataModel.RoomsDAO.exists?(:id, room.id)
@@ -25,11 +34,14 @@ defmodule Spotimate.Listening.RoomTest do
   end
 
   describe "spawn room" do
-    test "spawn a room", %{conn: conn} do
-      user = dummy_user()
-      room = Room.new_room("cool people only", user.id, "reallygoodtrack")
-      Room.spawn_room(conn, room.id, :static)
+    test "spawn a room with finite queue", %{conn: conn} do
+      with_mocks([
+        {Spotify.Recommendation, [], [get_recommendations: fn _, _ -> {:ok, @mocked_recs} end]}
+      ]) do
+        user = dummy_user()
+        room = Room.new_room("cool people only", user.id, "reallygoodtrack")
+        Room.spawn_room(conn, room.id)
+      end
     end
   end
-
 end

@@ -37,7 +37,7 @@ defmodule Spotimate.MixProject do
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.1"},
-      {:mock, "~> 0.1.1", only: :test},
+      {:mock, "~> 0.3.0", only: :test},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -48,6 +48,7 @@ defmodule Spotimate.MixProject do
       {:poison, "~> 3.1"},
       {:benchee, "~> 1.0", only: :dev},
       {:spotify_ex, "~> 2.0.9"},
+      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

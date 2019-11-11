@@ -30,7 +30,6 @@ defmodule SpotimateWeb.Router do
     get "/login", AuthController, :login
 
     get "/callback", AuthController, :callback
-
   end
 
   scope "/api", SpotimateWeb do
@@ -39,7 +38,5 @@ defmodule SpotimateWeb.Router do
     post "/room/new", RoomController, :new_room
 
     post "/room/listen", RoomController, :listen
-
   end
-
 end

@@ -6,5 +6,4 @@ defmodule Spotimate.Utils.Session do
       Map.put(acc, k, get_session(conn, k))
     end)
   end
-  
 end
