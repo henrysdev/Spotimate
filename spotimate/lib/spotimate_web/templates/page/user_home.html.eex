@@ -9,5 +9,12 @@
   <body>
     <%= render SpotimateWeb.ComponentView, "top_nav.html", conn: @conn %>
     <a href="/rooms">Listening Rooms</a>
+    <ul>
+      <%= for playlist <- @playlists do %>
+        <li>
+          <%= playlist.name %>
+        </li>
+      <% end %>
+    </ul>
   </body>
 </html>

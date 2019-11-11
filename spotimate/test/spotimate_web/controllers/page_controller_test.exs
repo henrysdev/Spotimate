@@ -2,12 +2,27 @@ defmodule SpotimateWeb.PageControllerTest do
   use SpotimateWeb.ConnCase
 
   import Plug.Test
+  import Mock
 
   alias Spotimate.{
     Listening.DataModel.Room,
     Listening.DataModel.RoomsDAO,
     Accounts.DataModel.User,
     Accounts.DataModel.UsersDAO
+  }
+
+  @mocked_playlists %Paging{
+    items: [
+      %Spotify.Playlist{
+        name: "Foo"
+      },
+      %Spotify.Playlist{
+        name: "Bar"
+      },
+      %Spotify.Playlist{
+        name: "Zoo"
+      }
+    ]
   }
 
   defp dummy_user() do
@@ -33,24 +48,34 @@ defmodule SpotimateWeb.PageControllerTest do
   end
 
   test "GET / with valid session redirects to home", %{conn: conn} do
-    user = dummy_user()
+    Mock.with_mocks [
+      {Spotify.Authentication, [], [refresh: fn c -> {:ok, c} end]},
+      {Spotify.Playlist, [], [get_users_playlists: fn _, _, _ -> {:ok, @mocked_playlists} end]}
+    ] do
+      user = dummy_user()
 
-    conn =
-      init_test_session(conn, user_id: user.id)
-      |> get("/")
+      conn =
+        init_test_session(conn, user_id: user.id)
+        |> get("/")
 
-    assert html_response(conn, 200) =~ "Spotimate - Home"
+      assert html_response(conn, 200) =~ "Spotimate - Home"
+    end
   end
 
   # Home
   test "GET /home", %{conn: conn} do
-    user = dummy_user()
+    Mock.with_mocks [
+      {Spotify.Authentication, [], [refresh: fn c -> {:ok, c} end]},
+      {Spotify.Playlist, [], [get_users_playlists: fn _, _, _ -> {:ok, @mocked_playlists} end]}
+    ] do
+      user = dummy_user()
 
-    conn =
-      init_test_session(conn, user_id: user.id)
-      |> get("/home")
+      conn =
+        init_test_session(conn, user_id: user.id)
+        |> get("/home")
 
-    assert html_response(conn, 200) =~ "Spotimate - Home"
+      assert html_response(conn, 200) =~ "Spotimate - Home"
+    end
   end
 
   test "GET /home with no valid session prompts login", %{conn: conn} do

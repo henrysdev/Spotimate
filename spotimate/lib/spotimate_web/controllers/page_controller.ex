@@ -3,6 +3,7 @@ defmodule SpotimateWeb.PageController do
   import Ecto.Query
 
   alias Spotimate.{
+    Spotify.Client,
     Listening.Room,
     Listening.DataModel.RoomsDAO,
     Utils
@@ -26,14 +27,15 @@ defmodule SpotimateWeb.PageController do
 
   def user_home(conn, _params) do
     if logged_in?(conn) do
-      render(conn, "user_home.html")
+      username = get_session(conn, :username)
+      playlists = Client.get_playlists(conn, username)
+      render(conn, :user_home, playlists: playlists)
     else
       render(conn, "login.html")
     end
   end
 
   def user_rooms(conn, _params) do
-    # TODO find a better way than nested if else...
     if logged_in?(conn) do
       user_id = get_session(conn, :user_id)
       user_rooms = RoomsDAO.get_rooms_created_by_user(user_id)
@@ -51,6 +53,7 @@ defmodule SpotimateWeb.PageController do
 
         render(conn, :room,
           room_name: room.name,
+          room_id: room_id,
           access_token: Spotify.Cookies.get_access_token(conn)
         )
       else

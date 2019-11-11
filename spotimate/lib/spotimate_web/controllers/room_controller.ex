@@ -19,10 +19,10 @@ defmodule SpotimateWeb.RoomController do
     } = Room.new_room(name, creator_id, seed_uri)
 
     # Spawn process for newly created room
-    Room.spawn_room(conn, id, :default)
+    Room.spawn_room(conn, id)
   end
 
-  def listen(conn, %{"device_id" => device_id}) do
+  def listen(conn, %{"device_id" => device_id, "room_id" => room_id}) do
     # Persist device id with session
     conn = put_session(conn, :device_id, device_id)
 
@@ -30,10 +30,9 @@ defmodule SpotimateWeb.RoomController do
     acc_tok = Spotify.Cookies.get_access_token(conn)
 
     %{
-      :curr_room => room_id,
       :user_id => user_id,
       :device_id => device_id
-    } = Utils.Session.fetch_multiple(conn, [:curr_room, :user_id, :device_id])
+    } = Utils.Session.fetch_multiple(conn, [:user_id, :device_id])
 
     # Get playhead
     playhead = Room.obtain_playhead(conn, room_id, user_id)

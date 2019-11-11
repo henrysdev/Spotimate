@@ -20,7 +20,7 @@ defmodule Spotimate.Listening.Room do
     room
   end
 
-  def spawn_room(conn, room_id, queue_gen \\ :default) do
+  def spawn_room(conn, room_id) do
     # Fetch room from DB and start it up
     %Room{
       id: id,
@@ -33,16 +33,10 @@ defmodule Spotimate.Listening.Room do
     Process.register(ph_pid, playhead)
 
     # Determine what function to use to generate tracks for the queue
-    generator_fn =
-      case queue_gen do
-        :default -> RecGenerators.spotify_recs(conn, seed_uri, 100)
-        _ -> RecGenerators.static_recs(1)
-      end
-
-    tracks = generator_fn.()
+    gen_tracks = RecGenerators.spotify_recs(conn, seed_uri, 100)
 
     # Spawn queue
-    {:ok, q_pid} = Queue.start_link([], tracks)
+    {:ok, q_pid} = Queue.start_link([], gen_tracks.())
 
     # Attach queue
     Playhead.attach_queue(playhead, q_pid)
@@ -54,11 +48,6 @@ defmodule Spotimate.Listening.Room do
     # TODO improve this...
     Process.sleep(100)
     Playhead.fetch(playhead)
-  end
-
-  def generate_queue(conn, %Room{} = room, count) do
-    seed_tracks = Utils.String.extract_uri_id(room.seed_uri)
-    Spotify.Recommendation.get_recommendations(conn, seed_tracks: seed_tracks)
   end
 
   def obtain_playhead(conn, room_id, user_id) do

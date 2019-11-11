@@ -9,13 +9,13 @@
   <body>
     <%= render SpotimateWeb.ComponentView, "top_nav.html", conn: @conn %>
     <ul class="pure-menu-list">
-        <%= for room <- @rooms do %>
-            <% name = room.name %>
-            <% link = "rooms/#{room.id}" %>
-            <li class="pure-menu-item">
-                <%= content_tag :a, name, class: "pure-menu-link", href: link %>
-            </li>
-        <% end %>
+      <%= for room <- @rooms do %>
+        <% name = room.name %>
+        <% link = "rooms/#{room.id}" %>
+        <li class="pure-menu-item">
+            <%= content_tag :a, name, class: "pure-menu-link", href: link %>
+        </li>
+      <% end %>
     </ul>
   </body>
 </html>

@@ -4,11 +4,11 @@ defmodule Spotimate.Accounts.Auth do
     User
   }
 
-  def login(username) do
+  defp login(username) do
     UsersDAO.fetch_by_username(username)
   end
 
-  def register(username, email) do
+  defp register(username, email) do
     UsersDAO.insert(%User{
       username: username,
       email: email
