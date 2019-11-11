@@ -19,7 +19,7 @@ defmodule Spotimate.Accounts.DataModel.UsersDAO do
   end
 
   def insert(%User{} = user) do
-    {:ok, user_record} = Repo.insert(user)
+    Repo.insert(user)
   end
 
   def fetch_by_username(username), do: Repo.get_by(User, username: username)

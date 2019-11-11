@@ -119,6 +119,8 @@ defmodule SpotimateWeb.PageControllerTest do
     conn =
       init_test_session(conn, user_id: user.id)
       |> get("/rooms/123")
+
+    assert html_response(conn, 404) =~ "Not Found"
   end
 
   test "GET /rooms/:id with no valid session prompts login", %{conn: conn} do

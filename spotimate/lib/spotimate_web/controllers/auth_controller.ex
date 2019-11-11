@@ -1,9 +1,10 @@
 defmodule SpotimateWeb.AuthController do
   use SpotimateWeb, :controller
 
-  alias Spotimate.Accounts.{
-    DataModel.User,
-    Auth
+  alias Spotimate.{
+    Accounts.DataModel.User,
+    Accounts.Auth,
+    Utils.Time
   }
 
   def login(conn, _params) do
@@ -23,13 +24,14 @@ defmodule SpotimateWeb.AuthController do
             |> put_session(:user_id, id)
             |> put_session(:username, username)
             |> put_session(:email, email)
+            |> put_session(:token_expiry, Time.future_utc_millis(60 * 20 * 1000))
             |> redirect(to: "/home")
 
-          _ ->
+          _error ->
             redirect(conn, to: "/error")
         end
 
-      {:error, reason, conn} ->
+      _error ->
         redirect(conn, to: "/error")
     end
   end

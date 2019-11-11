@@ -1,11 +1,6 @@
 defmodule Spotimate.Listening.Room.Queue do
   use Agent
 
-  alias Spotimate.Listening.Room.{
-    Playhead,
-    Queue
-  }
-
   def start_link(_opts, init_tracks \\ []) do
     Agent.start_link(fn -> init_tracks end)
   end
@@ -23,11 +18,7 @@ defmodule Spotimate.Listening.Room.Queue do
     )
   end
 
-  def peek(pid) do
-    Agent.get(pid, &List.last(&1))
-  end
+  def peek(pid), do: Agent.get(pid, &List.last(&1))
 
-  def peek_all(pid) do
-    Agent.get(pid, & &1)
-  end
+  def peek_all(pid), do: Agent.get(pid, & &1)
 end

@@ -4,7 +4,6 @@ defmodule SpotimateWeb.RoomController do
   alias Spotimate.{
     Listening.Room,
     Listening.DataModel,
-    Listening.RecGenerators,
     Spotify.Player,
     Utils
   }
@@ -14,8 +13,7 @@ defmodule SpotimateWeb.RoomController do
 
     # Create and persist new room
     %DataModel.Room{
-      id: id,
-      seed_uri: seed_uri
+      id: id
     } = Room.new_room(name, creator_id, seed_uri)
 
     # Spawn process for newly created room
@@ -29,13 +27,10 @@ defmodule SpotimateWeb.RoomController do
     # Fetch applicable session data
     acc_tok = Spotify.Cookies.get_access_token(conn)
 
-    %{
-      :user_id => user_id,
-      :device_id => device_id
-    } = Utils.Session.fetch_multiple(conn, [:user_id, :device_id])
+    device_id = get_session(conn, :device_id)
 
     # Get playhead
-    playhead = Room.obtain_playhead(conn, room_id, user_id)
+    playhead = Room.obtain_playhead(conn, room_id)
 
     # Start playing track
     Player.play_track(playhead, acc_tok, device_id)

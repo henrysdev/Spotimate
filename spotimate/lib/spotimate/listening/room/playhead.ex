@@ -32,7 +32,7 @@ defmodule Spotimate.Listening.Room.Playhead do
     case Queue.pop(queue_pid) do
       %Spotify.Track{} = track ->
         # Start track
-        deadline_utc = Time.now_utc_millis() + track.duration_ms
+        deadline_utc = Time.future_utc_millis(track.duration_ms)
         start_track(pid, deadline_utc, track)
         # Spawn timer process for track duration
         next_fn = fn -> play_next(pid, queue_pid, counter + 1) end

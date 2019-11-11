@@ -1,23 +1,22 @@
 defmodule Spotimate.Listening.Room do
-  alias Spotimate.{
-    Listening.DataModel.RoomsDAO,
-    Listening.DataModel.Room,
-    Listening.Room.Playhead,
-    Listening.Room.Queue,
-    Listening.RecGenerators,
-    Utils
+  alias Spotimate.Listening.{
+    DataModel.RoomsDAO,
+    DataModel.Room,
+    Room.Playhead,
+    Room.Queue,
+    RecGenerators
   }
 
   def new_room(name, creator_id, seed_uri) do
     # Insert room into DB
-    {:ok, room} =
-      RoomsDAO.insert(%Room{
-        name: name,
-        creator_id: creator_id,
-        seed_uri: seed_uri
-      })
-
-    room
+    case RoomsDAO.insert(%Room{
+           name: name,
+           creator_id: creator_id,
+           seed_uri: seed_uri
+         }) do
+      {:ok, room} -> room
+      error -> raise RuntimeError, message: IO.inspect(error)
+    end
   end
 
   def spawn_room(conn, room_id) do
@@ -50,7 +49,7 @@ defmodule Spotimate.Listening.Room do
     Playhead.fetch(playhead)
   end
 
-  def obtain_playhead(conn, room_id, user_id) do
+  def obtain_playhead(conn, room_id) do
     playhead = registered_playhead(room_id)
     plh_in_db? = RoomsDAO.exists?(:id, room_id)
 
